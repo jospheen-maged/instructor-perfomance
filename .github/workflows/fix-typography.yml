@@ -1,4 +1,4 @@
-name: Standardize Website Typography
+name: Improve Visible Typography and Metric Cards
 
 on:
   push:
@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  fix-typography:
+  improve-typography:
     runs-on: ubuntu-latest
     steps:
       - name: Check out main
@@ -17,72 +17,80 @@ jobs:
         with:
           ref: main
 
-      - name: Apply consistent typography system
+      - name: Apply visible typography hierarchy
         run: |
           python - <<'PY'
           from pathlib import Path
+          import re
 
           path = Path('index.html')
           text = path.read_text(encoding='utf-8')
 
-          # Use one locally available font stack across Windows, macOS and mobile.
-          text = text.replace(
-              'font-family:Inter,Segoe UI,Arial,sans-serif',
-              'font-family:"Segoe UI Variable","Segoe UI",system-ui,-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif'
-          )
+          start = '/* Visible typography hierarchy */'
+          end = '/* End visible typography hierarchy */'
+          block = r'''
+/* Visible typography hierarchy */
+:root{--font-sans:"Segoe UI",Arial,sans-serif}
+html,body,button,input,select,textarea{font-family:var(--font-sans)!important}
+body{font-size:15px!important;line-height:1.55!important;font-weight:400!important}
 
-          # Remove unsupported/interpolated weights that render differently by browser.
-          text = text.replace('font-weight:750', 'font-weight:600')
-          text = text.replace('font-weight:850', 'font-weight:700')
-          text = text.replace('font-weight:900', 'font-weight:800')
+.card{border-radius:20px!important}
+.card-head{padding:20px 22px!important}
+.card-head h3{font-size:18px!important;line-height:1.3!important;font-weight:700!important;letter-spacing:-.01em!important}
+.card-head p{font-size:13px!important;line-height:1.5!important;margin-top:5px!important}
+.card-body{padding:22px!important}
 
-          typography = '''
-/* Consistent typography system */
-html{
-  font-family:"Segoe UI Variable","Segoe UI",system-ui,-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
-  -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
-  text-rendering:optimizeLegibility;
+.metric-list{gap:18px!important}
+.metric{padding:20px!important;border-radius:18px!important;border-color:#d8e4ee!important;box-shadow:0 8px 22px rgba(31,70,104,.045)!important}
+.metric-top{align-items:flex-start!important}
+.metric h4{font-size:17px!important;line-height:1.35!important;font-weight:700!important;letter-spacing:-.01em!important}
+.metric p{font-size:14px!important;line-height:1.5!important;margin-top:6px!important}
+.weight{font-size:12px!important;font-weight:700!important;background:var(--orange-soft)!important;color:#d95d08!important;padding:6px 9px!important;border-radius:999px!important;line-height:1!important}
+.observe{font-size:13px!important;line-height:1.5!important;padding:12px 13px!important;margin:14px 0!important;border-radius:11px!important}
+.observe b{font-weight:700!important}
+
+.metric-row{grid-template-columns:minmax(320px,1.25fr) 160px minmax(240px,.95fr)!important;gap:14px!important;align-items:end!important}
+.choices{gap:9px!important}
+.choice label{min-height:46px!important;display:flex!important;align-items:center!important;justify-content:center!important;font-size:13px!important;line-height:1.3!important;font-weight:600!important;padding:10px 12px!important;border-radius:11px!important}
+.field{gap:7px!important}
+.field label{font-size:12px!important;line-height:1.3!important;font-weight:600!important;color:#41586c!important}
+.field input,.field select,.field textarea{font-size:14px!important;line-height:1.4!important;padding:12px 13px!important;border-radius:11px!important;min-height:46px!important}
+
+.exp-row{padding:16px!important;gap:14px!important;border-radius:15px!important}
+.exp-title strong{font-size:14px!important;line-height:1.35!important;font-weight:700!important}
+.exp-title span{font-size:12px!important;line-height:1.45!important;margin-top:5px!important}
+.exp-score{font-size:12px!important;font-weight:700!important}
+.experience-summary{padding:16px 18px!important;border-radius:15px!important}
+
+.badge,.btn,.tab,.pill,.nav button{font-family:var(--font-sans)!important;font-weight:600!important}
+.btn,.tab{font-size:14px!important}
+.notice,.comment,.table th,.table td{font-size:13px!important;line-height:1.5!important}
+.score-line{font-size:13px!important}
+
+@media(max-width:900px){
+  .metric-row{grid-template-columns:1fr!important}
+  .choice label{min-height:44px!important}
 }
-body{
-  font-family:inherit;
-  font-size:14px;
-  font-weight:400;
-  line-height:1.5;
-  font-synthesis:none;
-}
-button,input,select,textarea{
-  font-family:inherit;
-  font-size:inherit;
-  line-height:1.4;
-}
-h1,h2,h3,h4,p,span,label,small,strong,b,th,td{
-  font-family:inherit;
-}
-h1,h2,h3,h4,strong,b{font-weight:700}
-.nav button,.btn,.tab,.badge,.pill,.field label,.choice label,.stat-label,.weight,.live-badge{font-weight:600}
-.stat-value,.score-ring strong,.brand-mark,.avatar{font-weight:700;font-variant-numeric:tabular-nums}
-.field input,.field select,.field textarea,.table td,.notice,.comment,.observe,.step p,.stat-note{font-weight:400}
-.table th{font-weight:600}
-.nav-icon{font-family:inherit;font-weight:600;line-height:1}
+/* End visible typography hierarchy */
 '''
 
-          if '/* Consistent typography system */' not in text:
-              text = text.replace('</style>', typography + '\n</style>', 1)
+          pattern = re.compile(re.escape(start) + r'.*?' + re.escape(end), re.S)
+          if pattern.search(text):
+              text = pattern.sub(block.strip(), text)
+          else:
+              text = text.replace('</style>', block + '\n</style>', 1)
 
           path.write_text(text, encoding='utf-8')
           PY
 
-      - name: Commit typography fix
+      - name: Commit visible design fix
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add index.html
           if git diff --cached --quiet; then
-            echo "No typography changes required"
+            echo "No visual typography changes required"
           else
-            git commit -m "Fix inconsistent website typography [skip ci]"
+            git commit -m "Improve visible typography hierarchy and metric cards [skip ci]"
             git push origin main
           fi
-
-# Triggered after workflow existed on the default branch.
