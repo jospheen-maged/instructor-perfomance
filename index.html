@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>iSchool Quality Hub</title>
-<link rel="stylesheet" href="quality-redesign.css?v=4">
+<link rel="stylesheet" href="quality-redesign.css?v=7">
 </head>
 <body>
 <div class="app">
@@ -38,7 +38,7 @@
 </section>
 
 <section id="evaluation" class="section">
-  <div class="tabs"><button class="tab active">Regular Session</button><button class="tab">Sampled Review</button><button class="tab" data-jump="session12">Session 12</button></div>
+  <div class="tabs"><button class="tab active" data-review-mode="sampling">Session Sampling</button><button class="tab" data-review-mode="full">Full Review</button><button class="tab" data-jump="session12">Session 12</button></div>
   <div class="grid-2"><div class="stack">
     <div class="card"><div class="card-head"><div><h3>Review information</h3><p>Identify the reviewer, tutor, student and session.</p></div><span class="badge blue">Draft</span></div><div class="card-body"><div class="fields"><div class="field"><label>Reviewer role</label><select><option>Quality Control</option><option>Temporary Quality Associate</option><option>Mentor Reviewer</option><option>Senior Tutor Peer Reviewer</option></select></div><div class="field"><label>Reviewer name</label><input placeholder="Reviewer name"></div><div class="field"><label>Tutor name</label><input placeholder="Tutor name"></div><div class="field"><label>Tutor ID</label><input placeholder="T-0000"></div><div class="field"><label>Student name</label><input placeholder="Student name"></div><div class="field"><label>Session ID</label><input placeholder="S-000000"></div><div class="field"><label>Course / level</label><input placeholder="Course and level"></div><div class="field"><label>Session date</label><input type="date"></div></div></div></div>
     <div class="card"><div class="card-head"><div><h3>Metrics 1–4: Student learning outcomes</h3><p>Each metric contributes 20%.</p></div><span class="badge orange">80%</span></div><div class="card-body"><div id="regularCore" class="metric-list"></div></div></div>
@@ -81,6 +81,6 @@
 </main>
 </div>
 <div id="toast" class="toast">Saved</div>
-<script src="quality-redesign.js?v=4"></script>
+<script src="quality-redesign.js?v=7"></script>
 </body>
 </html>
