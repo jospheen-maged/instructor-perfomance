@@ -1,0 +1,86 @@
+name: Standardize Website Typography
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-typography.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fix-typography:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Apply consistent typography system
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('index.html')
+          text = path.read_text(encoding='utf-8')
+
+          # Use one locally available font stack across Windows, macOS and mobile.
+          text = text.replace(
+              'font-family:Inter,Segoe UI,Arial,sans-serif',
+              'font-family:"Segoe UI Variable","Segoe UI",system-ui,-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif'
+          )
+
+          # Remove unsupported/interpolated weights that render differently by browser.
+          text = text.replace('font-weight:750', 'font-weight:600')
+          text = text.replace('font-weight:850', 'font-weight:700')
+          text = text.replace('font-weight:900', 'font-weight:800')
+
+          typography = '''
+/* Consistent typography system */
+html{
+  font-family:"Segoe UI Variable","Segoe UI",system-ui,-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  text-rendering:optimizeLegibility;
+}
+body{
+  font-family:inherit;
+  font-size:14px;
+  font-weight:400;
+  line-height:1.5;
+  font-synthesis:none;
+}
+button,input,select,textarea{
+  font-family:inherit;
+  font-size:inherit;
+  line-height:1.4;
+}
+h1,h2,h3,h4,p,span,label,small,strong,b,th,td{
+  font-family:inherit;
+}
+h1,h2,h3,h4,strong,b{font-weight:700}
+.nav button,.btn,.tab,.badge,.pill,.field label,.choice label,.stat-label,.weight,.live-badge{font-weight:600}
+.stat-value,.score-ring strong,.brand-mark,.avatar{font-weight:700;font-variant-numeric:tabular-nums}
+.field input,.field select,.field textarea,.table td,.notice,.comment,.observe,.step p,.stat-note{font-weight:400}
+.table th{font-weight:600}
+.nav-icon{font-family:inherit;font-weight:600;line-height:1}
+'''
+
+          if '/* Consistent typography system */' not in text:
+              text = text.replace('</style>', typography + '\n</style>', 1)
+
+          path.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Commit typography fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          if git diff --cached --quiet; then
+            echo "No typography changes required"
+          else
+            git commit -m "Fix inconsistent website typography [skip ci]"
+            git push origin main
+          fi
