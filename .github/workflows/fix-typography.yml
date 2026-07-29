@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - '.github/workflows/fix-typography.yml'
+      - '.github/trigger-visible-typography.txt'
 
 permissions:
   contents: write
