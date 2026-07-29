@@ -3,7 +3,7 @@ const path = require("path");
 const zlib = require("zlib");
 
 const payloadDir = path.join(__dirname, "quality-payload");
-const outputDir = path.join(__dirname, "..", "quality-analytics");
+const outputDir = path.join(__dirname, "..", "public", "quality-analytics");
 
 function readParts(prefix) {
   return fs
@@ -24,4 +24,4 @@ function inflateToFile(prefix, fileName) {
 inflateToFile("app", "app.js");
 inflateToFile("index", "index.html");
 fs.writeFileSync(path.join(outputDir, ".nojekyll"), "");
-console.log("Quality analytics site generated successfully.");
+console.log("Quality analytics site generated in public/quality-analytics.");
