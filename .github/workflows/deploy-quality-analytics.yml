@@ -1,11 +1,10 @@
-name: Build Quality Analytics for Vercel
+name: Patch Quality Analytics for Vercel
 
 on:
   push:
     branches: [main]
     paths:
-      - "scripts/quality-payload/**"
-      - "scripts/generate-quality-analytics.cjs"
+      - "scripts/patch-quality-sla.cjs"
       - ".github/workflows/deploy-quality-analytics.yml"
   workflow_dispatch:
 
@@ -23,18 +22,18 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Generate browser dashboard
-        run: node scripts/generate-quality-analytics.cjs
+      - name: Patch SLA calculation
+        run: node scripts/patch-quality-sla.cjs
 
-      - name: Commit generated site
+      - name: Commit patched dashboard
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add public/quality-analytics/index.html public/quality-analytics/app.js public/quality-analytics/.nojekyll
+          git add public/quality-analytics/app.js
           if git diff --cached --quiet; then
-            echo "No generated changes to commit."
+            echo "No SLA changes to commit."
             exit 0
           fi
-          git commit -m "Generate quality analytics dashboard"
+          git commit -m "Fix stage SLA working-hour calculation"
           git push
