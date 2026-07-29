@@ -1,0 +1,60 @@
+name: Build Original Style Standalone
+
+on:
+  push:
+    branches: ["quality-hub-original-style"]
+    paths:
+      - ".github/workflows/build-original-style.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: quality-hub-original-style
+
+      - name: Create standalone website
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          html = Path('index.html').read_text(encoding='utf-8')
+          css = Path('quality-redesign.css').read_text(encoding='utf-8')
+          js = Path('quality-redesign.js').read_text(encoding='utf-8')
+
+          html = html.replace(
+              '<link rel="stylesheet" href="quality-redesign.css?v=4">',
+              '<style>\n' + css + '\n</style>'
+          )
+          html = html.replace(
+              '<div class="tabs"><button class="tab active">Regular Session</button><button class="tab">Sampled Review</button><button class="tab" data-jump="session12">Session 12</button></div>',
+              '<div class="tabs"><button class="tab active" data-review-mode="sampling">Session Sampling</button><button class="tab" data-review-mode="full">Full Review</button><button class="tab" data-jump="session12">Session 12</button></div>'
+          )
+          html = html.replace(
+              '<p>Student-Centric Evaluation</p>',
+              '<p>Student-Centric Evaluation</p><small style="display:block;margin-top:4px;color:#9fd7fb;font-size:9px;letter-spacing:.08em">ORIGINAL STYLE · NEW LINK</small>',
+              1
+          )
+          html = html.replace(
+              '<script src="quality-redesign.js?v=4"></script>',
+              '<script>\n' + js + '\n</script>'
+          )
+          Path('quality-hub-original.html').write_text(html, encoding='utf-8')
+          PY
+
+      - name: Commit standalone website
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add quality-hub-original.html
+          if ! git diff --cached --quiet; then
+            git commit -m "Add standalone original-style Quality Hub [skip ci]"
+            git push origin quality-hub-original-style
+          fi
