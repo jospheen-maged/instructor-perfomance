@@ -1,8 +1,28 @@
 const sections=[...document.querySelectorAll('.section')];
 const nav=[...document.querySelectorAll('[data-section]')];
 const titles={overview:['Overview','Student-centric quality model and pilot workspace'],evaluation:['New Evaluation','Five metrics, evidence, compliance and continuity'],session12:['Session 12','Final showcase scoring and eligibility'],continuity:['Continuity Analytics','Predictive signal reported outside the tutor score'],reconsideration:['Reconsideration','Independent evidence-based response path'],capacity:['Pilot Capacity','Coverage and safeguards calculator'],governance:['Governance','Reviewer scope and security boundaries']};
-function openSection(id){sections.forEach(x=>x.classList.toggle('active',x.id===id));nav.forEach(x=>x.classList.toggle('active',x.dataset.section===id));document.getElementById('pageTitle').textContent=titles[id][0];document.getElementById('pageSub').textContent=titles[id][1];scrollTo({top:0,behavior:'smooth'})}
+function openSection(id){const title=titles[id];if(!title)return;sections.forEach(x=>x.classList.toggle('active',x.id===id));nav.forEach(x=>x.classList.toggle('active',x.dataset.section===id));document.getElementById('pageTitle').textContent=title[0];document.getElementById('pageSub').textContent=title[1];window.scrollTo({top:0,behavior:'smooth'})}
 nav.forEach(x=>x.addEventListener('click',()=>openSection(x.dataset.section)));document.querySelectorAll('[data-jump]').forEach(x=>x.addEventListener('click',()=>openSection(x.dataset.jump)));
+
+const evaluationTabs=[...document.querySelectorAll('#evaluation .tabs .tab')];
+const reviewTabs=evaluationTabs.filter(x=>!x.dataset.jump);
+const reviewModes={
+  sampling:{label:'Session Sampling',subtitle:'Focused evidence sampling with escalation when needed.',notice:'Review the selected evidence windows first. Escalate to a Full Review when a possible flag, missing evidence or unclear context could affect the result.'},
+  full:{label:'Full Review',subtitle:'Complete-session evaluation across all five metrics.',notice:'Review the full recording from start to finish and document timestamped evidence for every scored metric, compliance issue and flag.'}
+};
+if(reviewTabs.length>=2){
+  reviewTabs[0].dataset.reviewMode='sampling';reviewTabs[0].textContent=reviewModes.sampling.label;
+  reviewTabs[1].dataset.reviewMode='full';reviewTabs[1].textContent=reviewModes.full.label;
+  const tabsBar=document.querySelector('#evaluation .tabs');
+  const modeNotice=document.createElement('div');modeNotice.id='reviewModeNotice';modeNotice.className='notice';modeNotice.style.marginBottom='18px';tabsBar.insertAdjacentElement('afterend',modeNotice);
+  const triggerCard=document.querySelector('#evaluation aside .card:last-child');
+  const triggerTitle=triggerCard?.querySelector('h3');const triggerSub=triggerCard?.querySelector('.card-head p');const triggerNotice=triggerCard?.querySelector('.notice');
+  function setReviewMode(mode){const config=reviewModes[mode]||reviewModes.sampling;reviewTabs.forEach(tab=>tab.classList.toggle('active',tab.dataset.reviewMode===mode));modeNotice.innerHTML=`<b>${config.label}</b><br>${config.notice}`;if(document.getElementById('evaluation').classList.contains('active'))document.getElementById('pageSub').textContent=config.subtitle;if(triggerTitle)triggerTitle.textContent=mode==='sampling'?'Full Review trigger':'Full Review mode';if(triggerSub)triggerSub.textContent=mode==='sampling'?'Use when sampling is insufficient.':'Complete-session evidence review is active.';if(triggerNotice)triggerNotice.textContent=mode==='sampling'?'Possible flag, missing evidence, unclear context or score-impacting uncertainty.':'Review the entire recording and capture complete timestamped evidence before finalising.'}
+  reviewTabs.forEach(tab=>tab.addEventListener('click',()=>setReviewMode(tab.dataset.reviewMode)));
+  const evaluationNav=document.querySelector('[data-section="evaluation"]');evaluationNav?.addEventListener('click',()=>setReviewMode(document.querySelector('#evaluation .tab.active[data-review-mode]')?.dataset.reviewMode||'sampling'));
+  setReviewMode('sampling');
+}
+
 const core=[
 {id:'concept',title:'Concept Understanding',q:'Did the student understand the concept, or only repeat steps?',o:'Answers concept-check questions, explains in their own words and predicts why something works.',labels:['Not Demonstrated','With Support','Independently']},
 {id:'application',title:'Independent Application',q:'Did the student apply and solve, or did the tutor lead the work?',o:'Who controls the screen, whether the student tries first, and whether hints replace direct instructions.',labels:['Tutor-Led','Guided','Student-Led']},
