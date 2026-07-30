@@ -1,7 +1,7 @@
 (()=>{
   "use strict";
   const BLUE="#056FEC";
-  const WHITE_LOGO="./iSchool-logo-white.svg?v=20260730-10";
+  const WHITE_LOGO="./iSchool-logo-white.svg?v=20260730-11";
 
   function injectStyle(){
     if(document.getElementById("qa-official-blue-style"))return;
@@ -16,8 +16,21 @@
       aside nav button:not(.bg-white):hover{background:rgba(255,255,255,.14)!important;color:#fff!important}
       aside nav button.bg-white{background:#fff!important;color:${BLUE}!important;box-shadow:0 10px 28px rgba(0,48,122,.18)!important}
       aside nav button.bg-white svg{color:${BLUE}!important}
-      aside .qae-logo{display:flex!important;width:145px!important;height:auto!important;padding:0!important;align-items:center!important;justify-content:flex-start!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
-      aside .qae-logo img{display:block!important;width:145px!important;max-width:100%!important;height:auto!important;background:transparent!important;filter:none!important}
+      aside .qae-logo{
+        display:block!important;
+        width:145px!important;
+        height:52px!important;
+        padding:0!important;
+        border:0!important;
+        border-radius:0!important;
+        background-color:transparent!important;
+        background-image:url("${WHITE_LOGO}")!important;
+        background-repeat:no-repeat!important;
+        background-position:left center!important;
+        background-size:contain!important;
+        box-shadow:none!important;
+      }
+      aside .qae-logo img{display:none!important}
       aside .m-4.rounded-2xl{border-color:rgba(255,255,255,.24)!important;background:rgba(255,255,255,.12)!important}
       aside .m-4.rounded-2xl p,
       aside .m-4.rounded-2xl div{color:#fff!important}
@@ -29,15 +42,16 @@
     document.head.appendChild(style);
   }
 
-  function applyLogo(){
-    document.querySelectorAll("aside .qae-logo img").forEach(img=>{
-      if(!img.src.includes("iSchool-logo-white.svg"))img.src=WHITE_LOGO;
-      img.alt="iSchool";
-    });
+  function preloadLogo(){
+    if(document.querySelector('link[data-qa-white-logo="1"]'))return;
+    const link=document.createElement("link");
+    link.rel="preload";
+    link.as="image";
+    link.href=WHITE_LOGO;
+    link.dataset.qaWhiteLogo="1";
+    document.head.appendChild(link);
   }
 
-  function apply(){injectStyle();applyLogo()}
-  new MutationObserver(()=>setTimeout(apply,20)).observe(document.documentElement,{childList:true,subtree:true});
-  document.readyState==="loading"?document.addEventListener("DOMContentLoaded",apply,{once:true}):apply();
-  setInterval(apply,1000);
+  preloadLogo();
+  injectStyle();
 })();
