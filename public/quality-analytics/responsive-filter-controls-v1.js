@@ -20,10 +20,10 @@
       .qa-filter-toggle svg{width:18px;height:18px;transition:transform .2s ease}
       .qa-filter-collapsed .qa-filter-toggle svg{transform:rotate(-90deg)}
       .qa-filter-collapsed>.qa-filter-body{display:none!important}
-      .qa-filter-header-actions{display:flex!important;align-items:center!important;gap:8px!important;margin-left:auto!important}
-      .qa-global-filter-card>.qa-filter-header{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important}
+      .qa-filter-header-actions{display:flex!important;align-items:center!important;gap:8px!important;flex:0 0 auto!important}
+      .qa-filter-header>button:not(.qa-filter-toggle){margin-left:auto!important}
+      .qa-global-filter-card>.qa-filter-header{display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:10px!important}
       .qti-filter-head{gap:10px!important}
-      .qti-filter-head>.qa-filter-header-actions{margin-left:auto!important}
       .qti-scroll,.qae-scroll{display:block!important;width:100%!important;max-width:100%!important;overflow-x:auto!important;overscroll-behavior-inline:contain;scrollbar-gutter:stable}
       .qti-scroll table,.qae-scroll table{width:max-content!important;min-width:100%!important;max-width:none!important}
       .qti-scroll th,.qti-scroll td,.qae-scroll th,.qae-scroll td{white-space:nowrap!important}
@@ -91,15 +91,11 @@
     card.classList.add("qa-filter-section");
     header.classList.add("qa-filter-header");
     body.classList.add("qa-filter-body");
-    let actions=header.querySelector(":scope > .qa-filter-header-actions");
-    if(!actions){
-      actions=document.createElement("div");actions.className="qa-filter-header-actions";
-      [...header.children].filter(x=>x.tagName==="BUTTON").forEach(x=>actions.appendChild(x));
-      header.appendChild(actions);
-    }
+    const actions=document.createElement("div");
+    actions.className="qa-filter-header-actions";
     const button=document.createElement("button");
     button.type="button";button.className="qa-filter-toggle";button.innerHTML=icon();
-    actions.appendChild(button);
+    actions.appendChild(button);header.appendChild(actions);
     const initial=stored(key);
     setCollapsed(card,body,button,key,initial);
     button.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();setCollapsed(card,body,button,key,!card.classList.contains("qa-filter-collapsed"))});
