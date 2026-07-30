@@ -1,0 +1,35 @@
+name: Restore Quality Hub UI
+
+on:
+  push:
+    paths:
+      - '.github/restore-quality-hub.trigger'
+
+permissions:
+  contents: write
+
+jobs:
+  restore-ui:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Restore the complete pre-typography Quality Hub
+        run: |
+          git show ca3c87597e8db6bc69ac867fe8623c1e3f1ef00f:index.html > index.html
+
+      - name: Commit restored UI
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          if git diff --cached --quiet; then
+            echo "Quality Hub is already restored"
+          else
+            git commit -m "Restore complete Quality Hub UI and features [skip ci]"
+            git push origin main
+          fi
