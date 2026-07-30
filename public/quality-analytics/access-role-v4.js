@@ -3,22 +3,27 @@
   const SUPABASE_URL="https://jpewcvzummlwiplbojip.supabase.co";
   const SUPABASE_KEY="sb_publishable_BKcXs7kCaFlZ2JKnBclV4Q_qyRKKPKD";
   const BLUE="#056FEC", LIGHT="#05ACFF", LOGO="./iSchool-logo-colors-20260730.svg?v=20260730-5";
+  const QUALITY_EMAIL="quality@ischooltech.com";
   const EMAILS={
     "quality.admin":"quality.system@ischooltech.com",
     "quality.system":"quality.system@ischooltech.com",
     "quality.management":"quality.management@ischooltech.com",
     "quality.supervisors":"quality.supervisors@ischooltech.com",
-    "quality.teamleaders":"quality.teamleaders@ischooltech.com"
+    "quality.teamleaders":"quality.teamleaders@ischooltech.com",
+    "quality":QUALITY_EMAIL,
+    "quality.coordinators":QUALITY_EMAIL,
+    "quality.qcs":QUALITY_EMAIL
   };
   const ROLE_BY_EMAIL={
     "quality.system@ischooltech.com":"admin",
     "quality.admin@internal.example.com":"admin",
     "quality.management@ischooltech.com":"management",
+    [QUALITY_EMAIL]:"management",
     "quality.supervisors@ischooltech.com":"supervisors",
     "quality.viewer@internal.example.com":"supervisors",
     "quality.teamleaders@ischooltech.com":"teamleaders"
   };
-  const LABELS={admin:"System Admin",management:"Management Analytics",supervisors:"Supervisors View",teamleaders:"Team Leaders Analytics"};
+  const LABELS={admin:"System Admin",management:"Management Analytics",quality:"Quality Coordinators",supervisors:"Supervisors View",teamleaders:"Team Leaders Analytics"};
   if(!window.supabase?.createClient){document.body.innerHTML="<div style='padding:40px;font-family:sans-serif'>Unable to load secure login. Please refresh.</div>";return;}
   const client=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
   window.__QA_SUPABASE__=client;
@@ -37,18 +42,19 @@
     }catch{}
     return ["admin","management","supervisors","teamleaders"].includes(role)?role:fallbackRole(user?.email);
   }
-  function controls(role){
+  function controls(displayRole){
     document.getElementById("qa-access-controls")?.remove();
     const w=document.createElement("div");w.id="qa-access-controls";
-    w.innerHTML=`<div id="qa-role-badge">${LABELS[role]||role}</div><button id="qa-logout" type="button">Log out</button>`;
+    w.innerHTML=`<div id="qa-role-badge">${LABELS[displayRole]||displayRole}</div><button id="qa-logout" type="button">Log out</button>`;
     w.querySelector("button").onclick=async()=>{await client.auth.signOut();location.reload()};document.body.appendChild(w);
   }
   async function activate(session){
     if(!session?.user)return showLogin();
     const role=await resolveRole(session.user);
-    window.__QA_SESSION__=session;window.__QA_ROLE__=role;
-    document.documentElement.dataset.qaRole=role;document.documentElement.classList.remove("qa-locked");document.getElementById("qa-login")?.remove();controls(role);
-    const detail={session,user:session.user,role,label:LABELS[role]||role,client};
+    const accessRole=String(session.user.email||"").toLowerCase()===QUALITY_EMAIL?"quality":role;
+    window.__QA_SESSION__=session;window.__QA_ROLE__=role;window.__QA_ACCESS_ROLE__=accessRole;
+    document.documentElement.dataset.qaRole=role;document.documentElement.dataset.qaAccessRole=accessRole;document.documentElement.classList.remove("qa-locked");document.getElementById("qa-login")?.remove();controls(accessRole);
+    const detail={session,user:session.user,role,accessRole,label:LABELS[accessRole]||LABELS[role]||role,client};
     window.dispatchEvent(new CustomEvent("qa-auth-ready",{detail}));window.dispatchEvent(new CustomEvent("qa-role-ready",{detail}));
   }
   function showLogin(message=""){
