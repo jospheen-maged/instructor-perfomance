@@ -1,7 +1,7 @@
 (()=>{
   "use strict";
   const BLUE="#056FEC";
-  const WHITE_LOGO="./iSchool-logo-white.svg?v=20260730-12";
+  const WHITE_LOGO="./iSchool-logo-white.svg?v=20260730-13";
 
   function injectStyle(){
     if(document.getElementById("qa-official-blue-style"))return;
@@ -16,10 +16,21 @@
       aside nav button:not(.bg-white):hover{background:rgba(255,255,255,.14)!important;color:#fff!important}
       aside nav button.bg-white{background:#fff!important;color:${BLUE}!important;box-shadow:0 10px 28px rgba(0,48,122,.18)!important}
       aside nav button.bg-white svg{color:${BLUE}!important}
+
+      aside .qa-sidebar-brand-row{
+        display:grid!important;
+        grid-template-columns:minmax(0,1fr) auto!important;
+        grid-template-areas:"logo close" "copy copy"!important;
+        align-items:start!important;
+        gap:9px 10px!important;
+        width:100%!important;
+        min-width:0!important;
+      }
       aside .qae-logo.qa-fixed-sidebar-logo{
+        grid-area:logo!important;
         display:block!important;
-        flex:0 0 145px!important;
-        width:145px!important;
+        width:176px!important;
+        max-width:100%!important;
         height:52px!important;
         padding:0!important;
         border:0!important;
@@ -34,6 +45,33 @@
       aside .qae-logo.qa-fixed-sidebar-logo img{display:none!important}
       aside .qae-logo:not(.qa-fixed-sidebar-logo),
       aside .qa-old-sidebar-logo-hidden{display:none!important}
+      aside .qa-sidebar-brand-copy{
+        grid-area:copy!important;
+        display:block!important;
+        width:100%!important;
+        min-width:0!important;
+        padding:0!important;
+      }
+      aside .qa-sidebar-brand-copy p:first-child{
+        margin:0!important;
+        color:#fff!important;
+        font-size:16px!important;
+        font-weight:850!important;
+        line-height:1.2!important;
+        white-space:normal!important;
+      }
+      aside .qa-sidebar-brand-copy p:last-child{
+        margin-top:4px!important;
+        color:rgba(255,255,255,.78)!important;
+        font-size:11px!important;
+        line-height:1.35!important;
+        white-space:normal!important;
+      }
+      aside .qa-sidebar-brand-row>button{
+        grid-area:close!important;
+        margin:0!important;
+        align-self:start!important;
+      }
       aside .m-4.rounded-2xl{border-color:rgba(255,255,255,.24)!important;background:rgba(255,255,255,.12)!important}
       aside .m-4.rounded-2xl p,
       aside .m-4.rounded-2xl div{color:#fff!important}
@@ -58,6 +96,8 @@
   function ensureLogo(){
     const row=document.querySelector("aside .border-b .flex.items-center.gap-3");
     if(!row)return;
+    row.classList.add("qa-sidebar-brand-row");
+
     let logo=row.querySelector(".qa-fixed-sidebar-logo");
     if(!logo){
       logo=row.querySelector(".qae-logo");
@@ -72,9 +112,12 @@
         row.insertBefore(logo,row.firstChild||null);
       }
     }
+
+    const copy=[...row.children].find(child=>child!==logo&&child.tagName!=="BUTTON"&&child.querySelector("p"));
+    if(copy)copy.classList.add("qa-sidebar-brand-copy");
+
     [...row.children].forEach(child=>{
-      if(child===logo||child.tagName==="BUTTON")return;
-      if(child.querySelector("p"))return;
+      if(child===logo||child===copy||child.tagName==="BUTTON")return;
       if(child.classList.contains("qae-logo"))child.classList.add("qa-old-sidebar-logo-hidden");
       else if(child.textContent?.trim()==="iS")child.classList.add("qa-old-sidebar-logo-hidden");
     });
