@@ -1,27 +1,28 @@
 (()=>{
 "use strict";
 const ROLES=[
-  {key:"management",label:"Management Analytics",note:"Full QC, TL, tutor and objection analytics"},
+  {key:"management",label:"Management Analytics",note:"Full QC, TL, tutor, trends and objection analytics"},
   {key:"quality",label:"Quality Coordinators",note:"quality@ischooltech.com • Full analytics without upload or settings"},
-  {key:"supervisors",label:"Supervisors View",note:"TL, team, tutor and objections without QC performance"},
-  {key:"teamleaders",label:"Team Leaders Analytics",note:"Shared TL view with team filters and TL SLA"}
+  {key:"supervisors",label:"Supervisors View",note:"TL, team, tutor, trends and objections without QC performance"},
+  {key:"teamleaders",label:"Team Leaders Analytics",note:"Shared TL view with team filters, trends and TL SLA"}
 ],TABS=[
   {key:"overview",label:"Executive Overview"},
+  {key:"trends",label:"Cycle Trends"},
   {key:"qc",label:"QC Analytics"},
   {key:"teams",label:"TL & Teams"},
   {key:"objections",label:"Objections & SLA"},
   {key:"daily",label:"QC's Daily Follow-up"},
   {key:"explorer",label:"Data Explorer"}
 ],ALLOW={
-  management:new Set(["overview","qc","teams","objections","daily","explorer"]),
-  quality:new Set(["overview","qc","teams","objections","daily","explorer"]),
-  supervisors:new Set(["overview","teams","objections"]),
-  teamleaders:new Set(["overview","teams","objections"])
+  management:new Set(["overview","trends","qc","teams","objections","daily","explorer"]),
+  quality:new Set(["overview","trends","qc","teams","objections","daily","explorer"]),
+  supervisors:new Set(["overview","trends","teams","objections"]),
+  teamleaders:new Set(["overview","trends","teams","objections"])
 },DEF={
-  management:{overview:1,qc:1,teams:1,objections:1,daily:1,explorer:1},
-  quality:{overview:1,qc:1,teams:1,objections:1,daily:1,explorer:1},
-  supervisors:{overview:1,qc:0,teams:1,objections:1,daily:0,explorer:0},
-  teamleaders:{overview:1,qc:0,teams:1,objections:1,daily:0,explorer:0}
+  management:{overview:1,trends:1,qc:1,teams:1,objections:1,daily:1,explorer:1},
+  quality:{overview:1,trends:1,qc:1,teams:1,objections:1,daily:1,explorer:1},
+  supervisors:{overview:1,trends:1,qc:0,teams:1,objections:1,daily:0,explorer:0},
+  teamleaders:{overview:1,trends:1,qc:0,teams:1,objections:1,daily:0,explorer:0}
 };
 let values=structuredClone(DEF);
 const css=document.createElement("style");css.textContent=`
