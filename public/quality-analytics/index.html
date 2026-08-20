@@ -10,7 +10,7 @@
   <script>
     tailwind.config = { theme: { extend: { boxShadow: { 'soft': '0 12px 35px rgba(31,42,85,.08)' } } } };
   </script>
-  <link rel="stylesheet" href="./qc-daily-follow-up-v1.css?v=20260804-24" />
+  <link rel="stylesheet" href="./qc-daily-follow-up-v1.css?v=20260820-1" />
   <style>
     *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#F5F8FC;color:#0f172a;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,select,input{font:inherit}::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:999px;border:3px solid transparent;background-clip:padding-box}@media print{aside,header,button,.no-print{display:none!important}main{padding-left:0!important}body,#root{background:#fff!important}section,.rounded-2xl{box-shadow:none!important;break-inside:avoid}}
   </style>
@@ -18,27 +18,58 @@
 <body>
   <div id="root"><div style="min-height:100vh;display:grid;place-items:center;color:#056FEC;font-weight:700">Loading Quality Intelligence…</div></div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="./access-role-v4.js?v=20260804-24"></script>
-  <script src="./cloud-sync-v1.js?v=20260804-24"></script>
-  <script src="./analytics-enhancements.js?v=20260804-24"></script>
-  <script src="./analytics-tie-fix.js?v=20260804-24"></script>
-  <script src="./brand-fix-20260730.js?v=20260804-24"></script>
-  <script src="./role-views-v2.js?v=20260804-24"></script>
-  <script src="./admin-access-control-v2.js?v=20260804-24"></script>
-  <script src="./role-analytics-v3.js?v=20260804-24"></script>
-  <script src="./score-view-fix-v1.js?v=20260804-24"></script>
-  <script src="./responsive-filter-controls-v1.js?v=20260804-24"></script>
-  <script src="./official-blue-white-brand-v1.js?v=20260804-24"></script>
-  <script src="./qc-filter-options-fix-v1.js?v=20260804-24"></script>
-  <script src="./qc-deep-analytics-v1.js?v=20260804-24"></script>
-  <script src="./qc-outcomes-sla-clarity-v1.js?v=20260804-24"></script>
-  <script src="./executive-intelligence-v1.js?v=20260804-24"></script>
-  <script src="./executive-qc-table-accuracy-v1.js?v=20260804-24"></script>
-  <script src="./executive-monthly-indicators-v1.js?v=20260804-24"></script>
-  <script src="./cycle-safe-upload-v1.js?v=20260804-24"></script>
-  <script src="./admin-reset-data-v1.js?v=20260804-24"></script>
-  <script src="./qc-daily-follow-up-v1.js?v=20260804-24"></script>
-  <script src="./qc-daily-permission-v1.js?v=20260804-24"></script>
-  <script src="./qc-daily-filters-visibility-v1.js?v=20260804-24"></script>
+  <script src="./access-role-v4.js?v=20260820-1"></script>
+  <script src="./cloud-sync-v1.js?v=20260820-1"></script>
+  <script>
+    (()=>{
+      "use strict";
+      const VERSION="20260820-1";
+      const enhancements=[
+        "analytics-enhancements.js",
+        "analytics-tie-fix.js",
+        "brand-fix-20260730.js",
+        "role-views-v2.js",
+        "admin-access-control-v2.js",
+        "role-analytics-v3.js",
+        "score-view-fix-v1.js",
+        "responsive-filter-controls-v1.js",
+        "official-blue-white-brand-v1.js",
+        "qc-filter-options-fix-v1.js",
+        "qc-deep-analytics-v1.js",
+        "qc-outcomes-sla-clarity-v1.js",
+        "executive-intelligence-v1.js",
+        "executive-qc-table-accuracy-v1.js",
+        "executive-monthly-indicators-v1.js",
+        "cycle-safe-upload-v1.js",
+        "admin-reset-data-v1.js",
+        "qc-daily-follow-up-v1.js",
+        "qc-daily-permission-v1.js",
+        "qc-daily-filters-visibility-v1.js"
+      ];
+      let loading=false,loaded=false,lastDetail=null;
+      const addScript=src=>new Promise(resolve=>{
+        const s=document.createElement("script");
+        s.src=`./${src}?v=${VERSION}`;
+        s.async=false;
+        s.onload=()=>resolve();
+        s.onerror=()=>{console.error(`Failed to load ${src}`);resolve()};
+        document.body.appendChild(s);
+      });
+      async function start(event){
+        lastDetail=event?.detail||lastDetail||{};
+        if(loaded||loading)return;
+        loading=true;
+        for(const src of enhancements)await addScript(src);
+        loaded=true;loading=false;
+        const detail={...lastDetail,session:window.__QA_SESSION__,user:window.__QA_SESSION__?.user,role:window.__QA_ROLE__,accessRole:window.__QA_ACCESS_ROLE__,client:window.__QA_SUPABASE__,cloudReady:true,replayed:true};
+        window.__QA_ENHANCEMENTS_READY__=true;
+        window.dispatchEvent(new CustomEvent("qa-cloud-data-ready",{detail}));
+        window.dispatchEvent(new CustomEvent("qa-auth-ready",{detail}));
+        window.dispatchEvent(new CustomEvent("qa-role-ready",{detail}));
+      }
+      window.addEventListener("qa-cloud-data-ready",start,{once:true});
+      if(window.__QA_CLOUD_READY__)start({detail:{cloudReady:true}});
+    })();
+  </script>
 </body>
 </html>
