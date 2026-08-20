@@ -1,7 +1,7 @@
 (()=>{
   "use strict";
-  const DB="quality-operations-analytics",STORE="datasets";
-  let suppress=false,appLoaded=false;
+  const DB="quality-operations-analytics",STORE="datasets",APP_VERSION="20260820-1";
+  let suppress=false,appLoaded=false,syncing=false;
   const timers=new Map();
   const clean=v=>String(v??"").trim();
   function reviewKey(row){return [row["Tutor ID"],row["Session Recording"]||row["Lesson Name"],row["Review Date"],row["QC Name"]].map(clean).join("|")}
@@ -30,22 +30,50 @@
     IDBObjectStore.prototype.clear=function(){const request=originalClear.call(this);if(!suppress&&this.name===STORE&&window.__QA_ROLE__==="admin"){request.addEventListener("success",()=>{queueUpload("reviews",[]);queueUpload("objections",[])})}return request};
   }
   async function cloudRows(client,fn){const {data,error}=await client.rpc(fn);if(error)throw error;return Array.isArray(data)?data:[]}
+  async function loadApp(){
+    if(appLoaded)return;
+    appLoaded=true;
+    try{await import(`./app.js?v=${APP_VERSION}`)}catch(error){appLoaded=false;console.error(error);status("Dashboard failed to load","red");throw error}
+  }
+  function emitReady(detail,reviews,objections,source){
+    const readyDetail={...detail,reviewsCount:reviews.length,objectionsCount:objections.length,source,cloudReady:true};
+    window.__QA_CLOUD_READY__=true;
+    window.__QA_DATA_COUNTS__={reviews:reviews.length,objections:objections.length};
+    window.dispatchEvent(new CustomEvent("qa-cloud-data-ready",{detail:readyDetail}));
+  }
   async function syncBeforeApp(detail){
-    patchIndexedDB();const {client,role}=detail;
+    if(syncing||window.__QA_CLOUD_READY__)return;
+    syncing=true;
+    patchIndexedDB();
+    const {client,role}=detail;
     status("Loading shared cloud data…");
     const localReviews=await readLocal("reviews"),localObjections=await readLocal("objections");
+    let readyReviews=localReviews,readyObjections=localObjections,source="local";
     try{
       const [cloudReviews,cloudObjections]=await Promise.all([cloudRows(client,"get_quality_reviews"),cloudRows(client,"get_quality_objections")]);
-      if(role==="admin"&&cloudReviews.length===0&&localReviews.length){await upload("reviews",localReviews)}else await writeLocal("reviews",cloudReviews);
-      if(role==="admin"&&cloudObjections.length===0&&localObjections.length){await upload("objections",localObjections)}else await writeLocal("objections",cloudObjections);
-      status("Cloud data ready","green");setTimeout(()=>document.getElementById("qa-cloud-status")?.remove(),2600);
+      if(role==="admin"&&cloudReviews.length===0&&localReviews.length){await upload("reviews",localReviews);readyReviews=localReviews}else{await writeLocal("reviews",cloudReviews);readyReviews=cloudReviews}
+      if(role==="admin"&&cloudObjections.length===0&&localObjections.length){await upload("objections",localObjections);readyObjections=localObjections}else{await writeLocal("objections",cloudObjections);readyObjections=cloudObjections}
+      source="cloud";
+      status(`Cloud data ready • ${readyReviews.length} reviews`,"green");
+      setTimeout(()=>document.getElementById("qa-cloud-status")?.remove(),2600);
     }catch(error){
       console.error(error);
-      if(role!=="admin"){await writeLocal("reviews",[]);await writeLocal("objections",[])}
-      status("Cloud setup incomplete — run the SQL upgrade","red");
+      if(role!=="admin"){
+        await writeLocal("reviews",[]);await writeLocal("objections",[]);
+        readyReviews=[];readyObjections=[];
+      }
+      status("Cloud setup incomplete — using protected fallback","red");
     }
-    if(!appLoaded){appLoaded=true;import(`./app.js?v=20260730-5`).catch(error=>{console.error(error);status("Dashboard failed to load","red")})}
+    try{
+      await loadApp();
+      emitReady(detail,readyReviews,readyObjections,source);
+    }finally{
+      syncing=false;
+    }
   }
-  function ready(){if(window.__QA_SESSION__&&window.__QA_SUPABASE__)syncBeforeApp({client:window.__QA_SUPABASE__,role:window.__QA_ROLE__});else window.addEventListener("qa-auth-ready",event=>syncBeforeApp(event.detail),{once:true})}
+  function ready(){
+    if(window.__QA_SESSION__&&window.__QA_SUPABASE__)syncBeforeApp({client:window.__QA_SUPABASE__,role:window.__QA_ROLE__,accessRole:window.__QA_ACCESS_ROLE__,session:window.__QA_SESSION__,user:window.__QA_SESSION__?.user});
+    else window.addEventListener("qa-auth-ready",event=>syncBeforeApp(event.detail),{once:true});
+  }
   document.readyState==="loading"?document.addEventListener("DOMContentLoaded",ready,{once:true}):ready();
 })();
