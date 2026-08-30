@@ -3,117 +3,112 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="theme-color" content="#056FEC" />
-  <meta name="description" content="Quality Month Lens — persistent multi-cycle tutor quality analytics." />
+  <meta name="theme-color" content="#f4f7fb" />
   <title>Quality Month Lens</title>
-  <link rel="stylesheet" href="./styles.css?v=20260830-1" />
+  <link rel="stylesheet" href="./styles.css?v=20260830-2" />
 </head>
 <body>
   <div id="loginGate" class="login-gate">
     <form id="loginForm" class="login-card" autocomplete="off">
-      <div class="login-logo"><img src="../quality-analytics/iSchool-logo-colors-20260730.svg?v=20260730-5" alt="iSchool" /></div>
-      <div class="eyebrow">QUALITY INTELLIGENCE</div>
+      <img class="login-logo" src="../quality-analytics/iSchool-logo-colors-20260730.svg?v=20260730-5" alt="iSchool" />
+      <div class="kicker">QUALITY INTELLIGENCE</div>
       <h1>Quality Month Lens</h1>
-      <p>Secure multi-cycle analytics with permanent cloud imports.</p>
+      <p>Executive month-over-month quality view.</p>
       <label>Username or email<input id="loginUser" autocomplete="username" required /></label>
       <label>Password<input id="loginPass" type="password" autocomplete="current-password" required /></label>
       <button id="loginBtn" class="btn primary wide" type="submit">Sign in</button>
       <div id="loginError" class="error"></div>
-      <small>Shared data across authorised devices</small>
     </form>
   </div>
 
-  <div id="app" class="app hidden">
-    <aside class="sidebar">
-      <div class="brand">
-        <img src="../quality-analytics/iSchool-logo-colors-20260730.svg?v=20260730-5" alt="iSchool" />
-        <div><strong>Quality Month Lens</strong><span>Cycle intelligence</span></div>
-      </div>
-      <nav id="nav">
-        <button class="nav-btn active" data-page="overview">Overview</button>
-        <button class="nav-btn" data-page="trends">Cycle Trends</button>
-        <button class="nav-btn" data-page="people">People</button>
-        <button class="nav-btn" data-page="flags">Flags & Metrics</button>
-        <button class="nav-btn manager-only" data-page="data">Data Manager</button>
-      </nav>
-      <div class="side-footer">
-        <div id="roleBadge" class="role-badge">—</div>
-        <button id="logoutBtn" class="link-btn">Log out</button>
-      </div>
-    </aside>
-
-    <main class="main">
-      <header class="topbar">
-        <div>
-          <div class="eyebrow">QUALITY INTELLIGENCE</div>
-          <h2 id="pageTitle">Quality Month Lens</h2>
-          <p id="pageSubtitle">The score can stay high while the risk moves underneath it.</p>
+  <div id="app" class="hidden">
+    <header class="site-header">
+      <div class="header-inner">
+        <div class="brand-lockup">
+          <img src="../quality-analytics/iSchool-logo-colors-20260730.svg?v=20260730-5" alt="iSchool" />
+          <div><strong>Quality Month Lens</strong><span>Quality Intelligence</span></div>
         </div>
-        <div class="top-actions">
-          <select id="cycleSelect" class="select"></select>
+        <nav class="top-nav">
+          <button class="nav-btn active" data-page="overview">Overview</button>
+          <button class="nav-btn" data-page="trends">Cycle Trends</button>
+          <button class="nav-btn" data-page="people">Coaching Priorities</button>
+          <button class="nav-btn" data-page="risk">Flags & Metrics</button>
+          <button class="nav-btn manager-only" data-page="data">Data Manager</button>
+        </nav>
+        <div class="account"><span id="roleBadge">—</span><button id="logoutBtn" class="text-btn">Log out</button></div>
+      </div>
+    </header>
+
+    <main class="shell">
+      <section class="command-bar">
+        <div class="title-block">
+          <div class="kicker" id="pageKicker">EXECUTIVE VIEW</div>
+          <h2 id="pageTitle">Quality performance</h2>
+          <p id="pageSubtitle">Score, pressure and tutor movement in one view.</p>
+        </div>
+        <div class="commands">
+          <select id="cycleSelect" class="control"></select>
           <button id="refreshBtn" class="btn">Refresh</button>
-          <button id="importShortcut" class="btn primary manager-only">Import Cycle</button>
+          <button id="importShortcut" class="btn primary manager-only">Import cycle</button>
         </div>
-      </header>
-
-      <section class="filterbar">
-        <select id="orgFilter" class="select"><option value="">All Organizations</option></select>
-        <select id="etlFilter" class="select"><option value="">All Team Leads</option></select>
-        <select id="qcFilter" class="select"><option value="">All QCs</option></select>
-        <input id="tutorSearch" class="search" placeholder="Search tutor or ID" />
-        <button id="clearFilters" class="btn subtle">Clear</button>
       </section>
 
-      <div id="statusBar" class="status-bar hidden"></div>
+      <section class="filters">
+        <select id="orgFilter" class="control"><option value="">All organizations</option></select>
+        <select id="etlFilter" class="control"><option value="">All team leads</option></select>
+        <select id="qcFilter" class="control"><option value="">All QCs</option></select>
+        <input id="tutorSearch" class="control search" placeholder="Search tutor or ID" />
+        <button id="clearFilters" class="text-btn">Clear filters</button>
+      </section>
+      <div id="statusBar" class="status hidden"></div>
 
       <section id="page-overview" class="page active-page">
-        <div id="hero" class="hero"></div>
+        <article id="hero" class="hero-card"></article>
         <div id="kpis" class="kpi-grid"></div>
-        <div class="grid-2">
-          <article class="panel"><div class="panel-head"><div><span class="section-no">01 · DIAGNOSIS</span><h3>Metric pressure</h3></div></div><div id="metricBars"></div></article>
-          <article class="panel"><div class="panel-head"><div><span class="section-no">02 · RISK</span><h3>Flag concentration</h3></div></div><div id="flagBars"></div></article>
+        <div class="section-grid two">
+          <article class="card"><div class="card-head"><div><div class="kicker">DIAGNOSIS</div><h3>Metric pressure</h3><p>Average metric score normalized to 100%.</p></div></div><div id="metricBars"></div></article>
+          <article class="card"><div class="card-head"><div><div class="kicker">RISK</div><h3>Flag occurrences</h3><p>Each flag line counts once; one review may contain several.</p></div></div><div id="flagBars"></div></article>
         </div>
-        <div class="grid-2">
-          <article class="panel"><div class="panel-head"><div><span class="section-no">03 · PEOPLE</span><h3>Bottom tutors</h3></div></div><div id="bottomTutors"></div></article>
-          <article class="panel"><div class="panel-head"><div><span class="section-no">04 · MOVEMENT</span><h3>Largest declines</h3></div></div><div id="declines"></div></article>
+        <div class="section-grid two">
+          <article class="card list-card"><div class="card-head"><div><div class="kicker">COACHING PRIORITIES</div><h3>Bottom 10 tutors</h3><p>Lowest average score among tutors with at least 2 reviews.</p></div><span class="tag amber">FOCUS LIST</span></div><div id="bottomTutors"></div></article>
+          <article class="card list-card"><div class="card-head"><div><div class="kicker">PERFORMANCE MOVEMENT</div><h3>10 downgraded tutors</h3><p id="movementSubtitle">Largest decline from the baseline cycle.</p></div><span class="tag amber" id="movementTag">BASELINE → CURRENT</span></div><div id="declines"></div></article>
         </div>
       </section>
 
       <section id="page-trends" class="page">
-        <div class="page-intro"><span class="section-no">CYCLE VIEW</span><h3>Track the same signals every month</h3><p>Volume, score, flags and tutor movement across all saved cycles.</p></div>
-        <div id="cycleCards" class="cycle-cards"></div>
-        <article class="panel"><div class="panel-head"><div><h3>Cycle comparison</h3><p>Filters apply across cycles.</p></div></div><div id="cycleTable" class="table-wrap"></div></article>
-        <div class="grid-2">
-          <article class="panel"><div class="panel-head"><h3>Overall score trend</h3></div><div id="scoreTrend"></div></article>
-          <article class="panel"><div class="panel-head"><h3>Review volume trend</h3></div><div id="volumeTrend"></div></article>
+        <div id="cycleCards" class="cycle-strip"></div>
+        <div class="section-grid two">
+          <article class="card"><div class="card-head"><div><div class="kicker">SCORE TREND</div><h3>Overall score by cycle</h3></div></div><div id="scoreTrend"></div></article>
+          <article class="card"><div class="card-head"><div><div class="kicker">COVERAGE</div><h3>Review volume by cycle</h3></div></div><div id="volumeTrend"></div></article>
         </div>
+        <article class="card"><div class="card-head"><div><div class="kicker">CYCLE COMPARISON</div><h3>Verified month-over-month view</h3><p>Historical reference cycles stay anchored to the original Quality Lens source; imported cycles use the saved cloud data.</p></div></div><div id="cycleTable" class="table-wrap"></div></article>
       </section>
 
       <section id="page-people" class="page">
-        <div class="grid-2">
-          <article class="panel"><div class="panel-head"><div><span class="section-no">TEAM LEADS</span><h3>Team performance</h3></div></div><div id="teamTable" class="table-wrap"></div></article>
-          <article class="panel"><div class="panel-head"><div><span class="section-no">QUALITY TEAM</span><h3>QC review profile</h3></div></div><div id="qcTable" class="table-wrap"></div></article>
+        <div class="section-grid two">
+          <article class="card list-card"><div class="card-head"><div><div class="kicker">LOW SCORE</div><h3>Bottom 10</h3><p>Minimum 2 reviews in the selected cycle.</p></div></div><div id="peopleBottom"></div></article>
+          <article class="card list-card"><div class="card-head"><div><div class="kicker">FLAGGED TUTORS</div><h3>Most flagged tutors</h3><p>Ranked by total flag occurrences, not flagged sessions.</p></div></div><div id="mostFlagged"></div></article>
         </div>
-        <article class="panel"><div class="panel-head"><div><span class="section-no">TUTORS</span><h3>Tutor performance table</h3></div><button id="exportBtn" class="btn subtle">Export filtered CSV</button></div><div id="tutorTable" class="table-wrap"></div></article>
+        <article class="card"><div class="card-head"><div><div class="kicker">TUTOR DETAIL</div><h3>Selected-cycle tutor table</h3><p>Average score, review count and total flag occurrences.</p></div><button id="exportBtn" class="btn">Export CSV</button></div><div id="tutorTable" class="table-wrap"></div></article>
       </section>
 
-      <section id="page-flags" class="page">
-        <div class="grid-2">
-          <article class="panel"><div class="panel-head"><div><span class="section-no">FLAGS</span><h3>Flag categories</h3></div></div><div id="flagDetailBars"></div></article>
-          <article class="panel"><div class="panel-head"><div><span class="section-no">METRICS</span><h3>Metric comparison</h3></div></div><div id="metricTable" class="table-wrap"></div></article>
+      <section id="page-risk" class="page">
+        <div class="section-grid two">
+          <article class="card"><div class="card-head"><div><div class="kicker">METRICS</div><h3>Metric health</h3></div></div><div id="metricTable" class="table-wrap"></div></article>
+          <article class="card"><div class="card-head"><div><div class="kicker">FLAGS</div><h3>Category concentration</h3></div></div><div id="flagDetailBars"></div></article>
         </div>
-        <article class="panel"><div class="panel-head"><div><span class="section-no">CASES</span><h3>Flagged reviews</h3></div></div><div id="flaggedTable" class="table-wrap"></div></article>
+        <article class="card"><div class="card-head"><div><div class="kicker">FLAGGED REVIEWS</div><h3>Case detail</h3><p>Only available from saved detailed rows for the selected cycle.</p></div></div><div id="flaggedTable" class="table-wrap"></div></article>
       </section>
 
       <section id="page-data" class="page manager-only">
-        <div class="data-hero">
-          <div><span class="section-no">DATA MANAGER</span><h3>Import another cycle — without losing the previous ones</h3><p>Every cloud import is saved permanently. Existing cycles stay untouched unless you deliberately replace one.</p></div>
-          <label class="upload-card"><input id="csvInput" type="file" accept=".csv,text/csv" /><span>Choose CSV</span><small>Tutor quality review export</small></label>
-        </div>
+        <article class="upload-panel">
+          <div><div class="kicker">DATA MANAGER</div><h3>Import a cycle without losing history</h3><p>Add a new cycle or deliberately replace one existing cycle. Other cycles stay untouched.</p></div>
+          <label class="upload-btn"><input id="csvInput" type="file" accept=".csv,text/csv" /><span>Choose CSV</span><small>Quality review export</small></label>
+        </article>
         <div id="importPreview" class="hidden"></div>
-        <div class="grid-2">
-          <article class="panel"><div class="panel-head"><div><h3>Cycle Manager</h3><p>Every imported cycle saved in the cloud.</p></div></div><div id="cycleManager"></div></article>
-          <article class="panel"><div class="panel-head"><div><h3>Import History</h3><p>Latest saved batches.</p></div></div><div id="importHistory" class="table-wrap"></div></article>
+        <div class="section-grid two">
+          <article class="card"><div class="card-head"><div><h3>Saved cycles</h3><p>Cloud data available to the dashboard.</p></div></div><div id="cycleManager"></div></article>
+          <article class="card"><div class="card-head"><div><h3>Import history</h3><p>Recent cycle changes.</p></div></div><div id="importHistory" class="table-wrap"></div></article>
         </div>
       </section>
     </main>
@@ -121,6 +116,6 @@
 
   <div id="toast" class="toast hidden"></div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="./app.js?v=20260830-1"></script>
+  <script src="./app.js?v=20260830-2"></script>
 </body>
 </html>
